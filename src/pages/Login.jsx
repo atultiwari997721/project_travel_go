@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { motion } from 'framer-motion';
 
 const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -25,11 +24,7 @@ const Login = () => {
   return (
     <div className="flex flex-col h-screen bg-primary">
       <div className="flex-1 flex flex-col items-center justify-center px-6">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-sm"
-        >
+        <div className="w-full max-w-sm">
           <div className="mb-8">
             <h1 className="text-4xl font-black text-secondary italic tracking-tighter mb-2">
               RAPIDO
@@ -109,7 +104,7 @@ const Login = () => {
               </form>
             )}
           </div>
-        </motion.div>
+        </div>
       </div>
       <div className="py-6 text-center text-secondary/60 text-xs font-semibold">
         By continuing, you agree to our Terms & Privacy Policy

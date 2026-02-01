@@ -1,127 +1,132 @@
-import React, { useState } from 'react';
-import { Menu, User, History, Shield, Info, LogOut, Bell, HelpCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Menu, User, History, Shield, Info, LogOut, Bell, HelpCircle, Heart, MapPin } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Map from '../components/Map';
 import BookingPanel from '../components/BookingPanel';
 import PermissionScreen from '../components/PermissionScreen';
 import { useRide } from '../context/RideContext';
-import { motion, AnimatePresence } from 'framer-motion';
 
 const Home = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user, logout, hasPermissions, grantPermissions } = useAuth();
   const { detectLiveLocation, pickup } = useRide();
 
+  console.log("Home Rendering, hasPermissions:", hasPermissions);
+
   // Auto detect location once permissions are granted
   useEffect(() => {
     if (hasPermissions && !pickup) {
+      console.log("Home: Triggering auto-detection");
       detectLiveLocation();
     }
   }, [hasPermissions, pickup, detectLiveLocation]);
 
+  // Failsafe Rendering Logic
   if (!hasPermissions) {
+    console.log("Home: Showing PermissionScreen");
     return <PermissionScreen onPermissionsGranted={grantPermissions} />;
   }
+
+  console.log("Home: Showing Main Interface (Map/Panel)");
 
   const menuItems = [
     { icon: User, label: 'My Profile' },
     { icon: History, label: 'Ride History' },
     { icon: Bell, label: 'Notifications' },
+    { icon: Heart, label: 'Saved Places' },
     { icon: Shield, label: 'Safety' },
-    { icon: HelpCircle, label: 'Support' },
-    { icon: Info, label: 'About' },
+    { icon: Info, label: 'About Rapido' },
   ];
 
   return (
-    <div className="relative h-screen w-full bg-gray-100 overflow-hidden font-sans">
+    <div className="relative h-screen w-full bg-white overflow-hidden font-sans">
+      
       {/* Sidebar Overlay */}
-      <AnimatePresence>
-        {isSidebarOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsSidebarOpen(false)}
-            className="absolute inset-0 bg-secondary/40 backdrop-blur-sm z-40 transition-all"
-          />
-        )}
-      </AnimatePresence>
+      {isSidebarOpen && (
+        <div 
+          onClick={() => setIsSidebarOpen(false)}
+          className="absolute inset-0 bg-secondary/60 backdrop-blur-md z-[1000] transition-all"
+        />
+      )}
 
       {/* Sidebar */}
-      <motion.div 
-        initial={{ x: '-100%' }}
-        animate={{ x: isSidebarOpen ? 0 : '-100%' }}
-        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="absolute top-0 left-0 h-full w-80 bg-white z-50 shadow-2xl flex flex-col"
+      <div 
+        className={`absolute top-0 left-0 h-full w-[85%] max-w-sm bg-white z-[1001] shadow-[25px_0_50px_-12px_rgba(0,0,0,0.25)] flex flex-col transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <div className="bg-primary p-8 pt-12 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-full -mr-10 -mt-10 blur-2xl" />
-          <div className="flex items-center space-x-4 mb-6 relative z-10">
-            <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center border-4 border-white shadow-lg">
-              <User size={32} className="text-primary" />
+        <div className="bg-primary p-10 pt-16 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-secondary/10 rounded-full -mr-16 -mt-16 blur-3xl" />
+          <div className="flex items-center space-x-5 mb-8 relative z-10">
+            <div className="w-20 h-20 bg-secondary rounded-[32px] flex items-center justify-center border-4 border-white shadow-2xl">
+              <User size={40} className="text-primary" />
             </div>
             <div>
-              <h2 className="text-xl font-black text-secondary leading-none mb-1">Rajesh</h2>
-              <p className="text-secondary font-bold text-sm tracking-tight opacity-70">+91 {user?.phoneNumber}</p>
+              <h2 className="text-2xl font-black text-secondary leading-none mb-1">Rajesh Reddy</h2>
+              <p className="text-secondary font-black text-xs tracking-tighter opacity-60 uppercase">+91 {user?.phoneNumber}</p>
             </div>
           </div>
-          <div className="flex space-x-4 relative z-10">
-            <div className="bg-secondary/10 px-4 py-2 rounded-xl text-secondary font-black text-xs uppercase tracking-widest">
-              4.9 Star
+          <div className="flex space-x-3 relative z-10">
+            <div className="bg-secondary text-primary px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
+              4.9 ★ Rider
             </div>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-1">
+        <div className="flex-1 overflow-y-auto p-6 space-y-2 py-8">
           {menuItems.map((item, i) => (
             <button 
               key={i} 
-              className="w-full flex items-center space-x-4 p-4 rounded-xl hover:bg-gray-50 text-gray-600 hover:text-secondary group transition-all active:scale-95"
+              className="w-full flex items-center space-x-5 p-5 rounded-[24px] hover:bg-gray-50 text-gray-500 hover:text-secondary group transition-all active:scale-[0.98]"
             >
-              <div className="p-2 rounded-lg bg-gray-50 group-hover:bg-primary transition-colors">
-                <item.icon size={20} className="group-hover:text-secondary" />
+              <div className="p-3 rounded-2xl bg-gray-50 group-hover:bg-primary transition-colors">
+                <item.icon size={22} className="group-hover:text-secondary transition-colors" />
               </div>
-              <span className="font-black text-sm uppercase tracking-wider">{item.label}</span>
+              <span className="font-black text-xs uppercase tracking-[0.15em]">{item.label}</span>
             </button>
           ))}
         </div>
 
-        <div className="p-6 border-t border-gray-100">
+        <div className="p-8 border-t border-gray-100">
           <button 
             onClick={logout}
-            className="w-full flex items-center justify-center space-x-3 p-4 border-2 border-gray-100 rounded-2xl text-red-500 font-black hover:bg-red-50 transition-colors uppercase tracking-widest text-xs"
+            className="w-full flex items-center justify-center space-x-3 p-5 border-2 border-gray-100 rounded-3xl text-red-500 font-black hover:bg-red-50 transition-colors uppercase tracking-[0.2em] text-[10px]"
           >
             <LogOut size={18} />
-            <span>Logout</span>
+            <span>Sign Out</span>
           </button>
         </div>
-      </motion.div>
+      </div>
 
-      {/* Header */}
-      <header className="absolute top-6 left-6 right-6 flex justify-between items-center z-30 pointer-events-none">
+      {/* Dynamic Header */}
+      <header className="absolute top-8 left-6 right-6 flex justify-between items-center z-[800] pointer-events-none">
         <button 
           onClick={() => setIsSidebarOpen(true)}
-          className="p-4 bg-white rounded-2xl shadow-xl hover:scale-110 active:scale-95 transition-all pointer-events-auto border-2 border-gray-50"
+          className="p-5 bg-white rounded-3xl shadow-[0_15px_35px_rgba(0,0,0,0.1)] hover:scale-105 active:scale-95 transition-all pointer-events-auto border-2 border-gray-50 group"
         >
-          <Menu size={24} className="text-secondary" />
+          <Menu size={24} className="text-secondary group-hover:rotate-12 transition-transform" />
         </button>
-        <div className="flex space-x-3 pointer-events-auto">
-          <button className="p-4 bg-primary text-secondary rounded-2xl shadow-xl hover:scale-110 active:scale-95 transition-all font-black italic tracking-tighter border-2 border-white">
+        <div className="flex items-center space-x-3 pointer-events-auto">
+          <div className="px-6 py-4 bg-primary text-secondary rounded-3xl shadow-[0_15px_35px_rgba(0,0,0,0.1)] font-black italic tracking-tighter text-xl border-2 border-white select-none">
             RAPIDO
-          </button>
+          </div>
         </div>
       </header>
 
-      {/* Map Background */}
-      <div className="absolute inset-0 z-10">
+      {/* Map Content Layer */}
+      <div className="absolute inset-0 z-0 bg-gray-50">
         <Map />
       </div>
 
       {/* Booking Panel */}
       <BookingPanel />
 
+      {/* Failsafe Debug Overlay */}
+      <div className="fixed top-0 right-0 p-2 z-[9999] pointer-events-none opacity-20">
+        <span className="bg-black text-white text-[8px] px-2 py-1 rounded">ROOT_ACTIVE</span>
+      </div>
+
     </div>
   );
 };
 
 export default Home;
+
